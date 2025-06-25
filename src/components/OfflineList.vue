@@ -1,38 +1,45 @@
 <template>
     <div class="offline-list shadow-box mb-4">
-        <h3>Offline Devices</h3>
-
+        <h3>{{ $t("Offline Devices") }}</h3>
         <ul v-if="offlineMonitors.length > 0" class="list-unstyled">
             <li
-                v-for="monitor in offlineMonitors"
-                :key="monitor.id"
+                v-for="item in offlineMonitors"
+                :key="item.monitor.id"
                 class="flashing-red mb-2"
             >
                 <router-link
-                    :to="`/dashboard/${monitor.id}`"
+                    :to="`/dashboard/${item.monitor.id}`"
                     class="text-danger"
                 >
-                    {{ monitor.name }}
+                    {{ item.monitor.name }}
                 </router-link>
+                — {{ $t("Offline") }} <Datetime :value="item.heartbeat.time" />
             </li>
         </ul>
-
         <div v-else>
-            ✅ All devices online
+            ✅ {{ $t("All devices online") }}
         </div>
     </div>
 </template>
 
 <script>
+import Datetime from "./Datetime.vue";
+
 export default {
     name: "OfflineList",
+    components: {
+        Datetime,
+    },
     computed: {
         offlineMonitors() {
             const monitors = Object.values(this.$root.monitorList || {});
             const heartbeats = this.$root.lastHeartbeatList || {};
             return monitors
-                .filter((m) => heartbeats[m.id]?.status === 0)
-                .sort((a, b) => a.name.localeCompare(b.name));
+                .map((m) => ({ monitor: m, heartbeat: heartbeats[m.id] }))
+                .filter((item) => item.heartbeat?.status === 0)
+                .sort((a, b) =>
+                    a.monitor.name.localeCompare(b.monitor.name)
+                );
         },
     },
 };
@@ -46,6 +53,6 @@ export default {
 
 @keyframes flash {
     0%, 100% { opacity: 1; }
-    50%      { opacity: 0.4; }
+    50%       { opacity: 0.4; }
 }
 </style>
