@@ -13,7 +13,7 @@
                 >
                     {{ item.monitor.name }}
                 </router-link>
-                — {{ $t("Offline") }} <Datetime :value="item.heartbeat.time" />
+                <span class="offline-text">— {{ $t("Offline") }} <Datetime :value="item.heartbeat.time" /></span>
             </li>
         </ul>
         <div v-else>
@@ -48,7 +48,12 @@ export default {
 <style scoped>
 .flashing-red {
     animation: flash 1.5s infinite;
-    font-weight: bold;
+}
+
+.offline-text {
+    font-size: 0.85em;
+    font-weight: normal;
+    margin-left: 8px;
 }
 
 @keyframes flash {
